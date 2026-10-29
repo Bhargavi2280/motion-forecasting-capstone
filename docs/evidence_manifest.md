@@ -40,7 +40,7 @@
 
 \- Validation: 850
 
-\- Test: TO FILL IN after building the test set
+\- Test: 825
 
 
 
