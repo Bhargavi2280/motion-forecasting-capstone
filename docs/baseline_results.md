@@ -152,7 +152,7 @@ but no gain in overall error. The 95% coverage target was not met (53%). At K=6 
 lowered dense_minADE by 3.6% (p=0.0045), but that gain disappears at K=20.
 
 ### Negative tests
-NT-1 collapse: see mode-spread check. NT-2: rare_cov 53% and turn_cov 18% on test, 6 m coverage reported as sensitivity.
+NT-1 collapse: (collapse to one path): not measured. NT-2: rare_cov 53% and turn_cov 18% on test, 6 m coverage reported as sensitivity.
 NT-3: neighbours masked removes the K=6 gain (ablation). NT-4: out of scope for an offline dataset.
 NT-5: error gain at K=6 did not come with a rare-coverage gain.
 
