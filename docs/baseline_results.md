@@ -111,3 +111,19 @@ mode usage (top-ranked mode share): 0.11, 0.42, 0.04, 0.04, 0.36, 0.03
 | Interaction | 2.93 ± 0.05 | 36.78 ± 2.77 | 13.18 ± 6.93 |
 
 10 paired seeds, validation only, test untouched. Interaction lowers dense_minADE by 0.109 (about 3.6%) and wins on 9 of 10 seeds (paired t-test p = 0.0045). The gain is reliable but small and below the 5% KPI-3 target. Rare and turn coverage show no detectable change.
+
+### O3 ablation (validation only, 10 seeds, dense scenes)
+
+| Setting | dense_minADE | vs reference | wins vs ref | p vs ref | p vs full |
+|---|---|---|---|---|---|
+| Reference | 3.04 | n/a | n/a | n/a | n/a |
+| Interaction, 0 neighbours | 3.072 | +0.028 | 5/10 | 0.38 | <0.0001 |
+| Interaction, 4 neighbours | 3.012 | -0.032 | 6/10 | 0.25 | 0.0125 |
+| Interaction, mean pooling (no attention) | 3.016 | -0.028 | 7/10 | 0.39 | 0.032 |
+| Interaction, full (all neighbours + attention) | 2.935 | -0.109 | 9/10 | 0.0045 | n/a |
+
+Masking all neighbours removes the entire gain (NT-3: interactions ignored), so the
+improvement comes from neighbour information, not model capacity. The gain grows with
+the number of neighbours, and replacing attention with mean pooling loses most of it.
+Caveats: paired t-tests on 10 seeds without multiple-comparison correction; nb4 assumes
+nearest-first neighbour ordering; the pooling variant also removes the target key.
