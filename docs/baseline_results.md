@@ -127,3 +127,35 @@ improvement comes from neighbour information, not model capacity. The gain grows
 the number of neighbours, and replacing attention with mean pooling loses most of it.
 Caveats: paired t-tests on 10 seeds without multiple-comparison correction; nb4 assumes
 nearest-first neighbour ordering; the pooling variant also removes the target key.
+
+## Final results (frozen config: K=20, relax 0.05, no oversampling)
+
+Validation was used for all selection; test was run once.
+
+### Validation, coverage experiments (interaction model, 5 seeds)
+K=6 base rare_cov ~34-37%; relaxed WTA, endpoint-aware selection and rare oversampling gave no clear gain.
+K=10 ~46%, K=20 ~60%. Larger K is the only lever that helped.
+
+### Validation, K=20 reference vs interaction (5 seeds)
+dense_minADE 2.17 vs 2.18 (p=0.83); rare_cov 52.99 vs 60.00 (p=0.071); turn_cov 25.45 vs 30.91 (p=0.40).
+
+### Test (825 scenes, 164 rare, 34 extreme_turn; 10 paired seeds; run once)
+
+| Metric | Reference | Interaction | Note |
+|---|---|---|---|
+| dense_minADE | 2.33 +/- 0.05 | 2.33 +/- 0.05 | no difference (p=0.92) |
+| rare_cov (4 m) | 48.35 +/- 2.03 | 53.17 +/- 2.90 | +4.8 pts, higher on 9/10 seeds (p=0.004) |
+| turn_cov | 16.76 +/- 3.41 | 18.53 +/- 5.20 | not detectable (p=0.19) |
+
+Conclusion: interaction gives a small, consistent gain in rare-behaviour coverage at K=20
+but no gain in overall error. The 95% coverage target was not met (53%). At K=6 interaction
+lowered dense_minADE by 3.6% (p=0.0045), but that gain disappears at K=20.
+
+### Negative tests
+NT-1 collapse: see mode-spread check. NT-2: rare_cov 53% and turn_cov 18% on test, 6 m coverage reported as sensitivity.
+NT-3: neighbours masked removes the K=6 gain (ablation). NT-4: out of scope for an offline dataset.
+NT-5: error gain at K=6 did not come with a rare-coverage gain.
+
+### Limitations
+Coverage far below target; only 34 test turn samples; KPI-2, KPI-4, KPI-6 not measured;
+t-tests unadjusted for multiple comparisons; larger K raises best-of-K mechanically.
