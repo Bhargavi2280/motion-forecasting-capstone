@@ -64,3 +64,41 @@ Val ADE of the GRU at epoch 60: 6.66
 
 \- These gaps motivate the multi-modal reference model (O2) and the interaction model (O3).
 
+\## Reference: multi-modal GRU (K=6, 60 epochs, seed 0)
+
+val minADE@6 at epoch 60: 3.05
+
+mode usage (top-ranked mode share): 0.11, 0.42, 0.04, 0.04, 0.36, 0.03
+
+
+
+| subset | n | minADE | minFDE | miss% | coverage% |
+
+|---|---|---|---|---|---|
+
+| all | 850 | 3.05 | 7.79 | 65.8 | 34.2 |
+
+| lane\_change | 71 | 3.40 | 8.26 | 80.3 | 19.7 |
+
+| sudden\_stop | 49 | 1.50 | 2.45 | 16.3 | 83.7 |
+
+| hard\_brake | 44 | 3.95 | 8.18 | 72.7 | 27.3 |
+
+| extreme\_turn | 22 | 5.78 | 14.88 | 81.8 | 18.2 |
+
+| vulnerable | 86 | 1.20 | 2.80 | 23.3 | 76.7 |
+
+| any\_rare | 177 | 3.28 | 7.49 | 61.6 | 38.4 |
+
+
+
+\## Resource profile (Tesla T4, multi-modal GRU)
+
+\- parameters: <number>
+
+\- inference: <number> ms per sample
+
+\- peak GPU memory: <number> MB
+
+\- training time: about 17 s for 60 epochs
+
