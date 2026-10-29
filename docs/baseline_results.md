@@ -102,3 +102,12 @@ mode usage (top-ranked mode share): 0.11, 0.42, 0.04, 0.04, 0.36, 0.03
 
 \- training time: about 17 s for 60 epochs
 
+
+## O3 interaction vs reference
+
+| Model | dense_minADE | rare_cov (%) | turn_cov (%) |
+|---|---|---|---|
+| Reference | 3.04 ± 0.06 | 36.16 ± 2.79 | 10.91 ± 3.18 |
+| Interaction | 2.93 ± 0.05 | 36.78 ± 2.77 | 13.18 ± 6.93 |
+
+10 paired seeds, validation only, test untouched. Interaction lowers dense_minADE by 0.109 (about 3.6%) and wins on 9 of 10 seeds (paired t-test p = 0.0045). The gain is reliable but small and below the 5% KPI-3 target. Rare and turn coverage show no detectable change.

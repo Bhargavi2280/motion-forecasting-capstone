@@ -44,3 +44,33 @@ def wta_loss(trajs, logits, y, relax=0.05):
     reg = (1 - relax) * err[n, best] + relax * err.mean(1)
     cls = nn.functional.cross_entropy(logits, best)
     return reg.mean() + 0.1 * cls, best
+
+def make_batch_nb(samples, device):
+    x, typ, y = make_batch(samples, device)
+    nb = np.stack([s['nb'] for s in samples])          # N,8,11,2
+    m = np.stack([s['nb_mask'] for s in samples])      # N,8,11
+    vel = np.zeros_like(nb); vel[:, :, 1:] = (nb[:, :, 1:] - nb[:, :, :-1]) / 0.1
+    f = np.concatenate([nb / SCALE, vel / SCALE, m[..., None]], -1) * m[..., None]
+    valid = m.sum(-1) > 0
+    return (x, typ, y, torch.tensor(f, dtype=torch.float32, device=device),
+            torch.tensor(valid, device=device))
+
+class GRUInteract(nn.Module):
+    def __init__(self, hid=128, K=6, heads=4):
+        super().__init__()
+        self.K = K
+        self.gru = nn.GRU(5, hid, batch_first=True)
+        self.nb_gru = nn.GRU(5, hid, batch_first=True)
+        self.attn = nn.MultiheadAttention(hid, heads, batch_first=True)
+        self.trunk = nn.Sequential(nn.Linear(2 * hid + 3, 256), nn.ReLU())
+        self.traj = nn.Linear(256, K * 160)
+        self.prob = nn.Linear(256, K)
+    def forward(self, x, typ, nb, nb_valid):
+        _, h = self.gru(x); h = h[-1]                                 # N,hid
+        N, M, T, F = nb.shape
+        _, e = self.nb_gru(nb.reshape(N * M, T, F)); e = e[-1].view(N, M, -1)
+        keys = torch.cat([h[:, None], e], 1)                          # target itself is always a valid key
+        valid = torch.cat([torch.ones(N, 1, dtype=torch.bool, device=x.device), nb_valid], 1)
+        ctx, _ = self.attn(h[:, None], keys, keys, key_padding_mask=~valid)
+        z = self.trunk(torch.cat([h, ctx[:, 0], typ], -1))
+        return self.traj(z).view(-1, self.K, 80, 2), self.prob(z)
